@@ -29,21 +29,18 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 
-// Time
-let time = Date.now()
+const clock = new THREE.Clock()
 
 // Animations
 const nextFrame = () => {
-  // This time calculation, makes sure that the animation happens at the same speed on at all FPS.
-  // This will mean it looks the same on different monitors with different frame rates.
-  const currentTime = Date.now()
-  const deltaTime = currentTime - time
-  time = currentTime
 
-  console.log(deltaTime);
+  // Clock
+  const elapsedTime = clock.getElapsedTime()
 
   // Update objects
-  mesh.rotation.y -= 0.001 * deltaTime;
+  camera.position.y = Math.sin(elapsedTime)
+  camera.position.x = Math.cos(elapsedTime)
+  camera.lookAt(mesh.position)
 
   // Render
   renderer.render(scene, camera);
