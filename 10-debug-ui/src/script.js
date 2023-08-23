@@ -9,13 +9,18 @@ import GUI from 'lil-gui';
 const gui = new GUI();
 
 const parameters = {
-    color: 0xff0000,
-    spin: () => {
-        gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2})
-    }
-}
-
-
+  color: 0xff0000,
+  spinX: () => {
+    gsap.to(mesh.rotation, { duration: 1, x: mesh.rotation.x + Math.PI * 2 });
+  },
+  spinY: () => {
+    gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 });
+  },
+  spinZ: () => {
+    gsap.to(mesh.rotation, { duration: 1, z: mesh.rotation.z + Math.PI * 2 });
+  },
+  segments: 1,
+};
 
 /**
  * Base
@@ -29,20 +34,43 @@ const scene = new THREE.Scene();
 /**
  * Object
  */
-const geometry = new THREE.BoxGeometry(1, 1, 1);
+const geometry = new THREE.BoxGeometry(
+  1,
+  1,
+  1,
+  parameters.segments,
+  parameters.segments,
+  parameters.segments
+);
 const material = new THREE.MeshBasicMaterial({ color: parameters.color });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
 // Debug UI
-
-gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('elevation');
+gui.add(mesh.position, 'x').min(-3).max(3).step(0.01).name('x-axis position');
+gui.add(mesh.position, 'y').min(-3).max(3).step(0.01).name('y-axis position');
+gui.add(mesh.position, 'z').min(-3).max(3).step(0.01).name('z-axis position');
+gui.add(mesh.rotation, 'x').min(-3).max(3).step(0.01).name('x-axis rotation');
+gui.add(mesh.rotation, 'y').min(-3).max(3).step(0.01).name('y-axis rotation');
+gui.add(mesh.rotation, 'z').min(-3).max(3).step(0.01).name('z-axis rotation');
 gui.add(mesh, 'visible')
 gui.add(material, 'wireframe')
 gui.addColor(parameters, 'color').onChange(() => {
     material.color.set(parameters.color)
 })
-gui.add(parameters, 'spin')
+gui.add(parameters, 'spinX');
+gui.add(parameters, 'spinY')
+gui.add(parameters, 'spinZ');
+gui.add(parameters, 'segments').min(1).max(10).step(1).onChange(() => {
+    mesh.geometry = new THREE.BoxGeometry(
+      1,
+      1,
+      1,
+      parameters.segments,
+      parameters.segments,
+      parameters.segments
+    );
+})
 
 /**
  * Sizes
