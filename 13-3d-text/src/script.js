@@ -87,9 +87,9 @@ fontLoader.load(
 
     const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
 
-    const numDounts = 200;
+    const numDonuts = 200;
 
-    for (let i = 0; i < numDounts; i++) {
+    for (let i = 0; i < numDonuts; i++) {
       const donut = new THREE.Mesh(donutGeometry, material);
 
       donut.position.x = (Math.random() - 0.5) * 10;
@@ -119,6 +119,7 @@ fontLoader.load(
           x: text.rotation.x + Math.PI * 2,
         });
       },
+      numDonuts: 200,
     };
 
     gui
@@ -180,7 +181,42 @@ fontLoader.load(
         material.matcap = matcapTexture;
         material.needsUpdate = true;
       });
-    gui.add(parameters, 'spinText').name('Press to Spin Text');
+    gui
+      .add(parameters, 'numDonuts')
+      .min(0)
+      .max(500)
+      .step(1)
+      .name('Number of Donuts')
+      .onChange(() => {
+        const currentDonuts = donutsGroup.children.length;
+        const targetDonuts = parameters.numDonuts;
+
+        if (currentDonuts < targetDonuts) {
+          const numToAdd = targetDonuts - currentDonuts;
+          for (let i = 0; i < numToAdd; i++) {
+            const donut = new THREE.Mesh(donutGeometry, material);
+
+            donut.position.x = (Math.random() - 0.5) * 10;
+            donut.position.y = (Math.random() - 0.5) * 10;
+            donut.position.z = (Math.random() - 0.5) * 10;
+
+            donut.rotation.x = Math.random() * Math.PI;
+            donut.rotation.y = Math.random() * Math.PI;
+
+            const scale = Math.random();
+            donut.scale.set(scale, scale, scale);
+
+            donutsGroup.add(donut);
+          }
+        } else if (currentDonuts > targetDonuts) {
+          const numToRemove = currentDonuts - targetDonuts;
+          for (let i = 0; i < numToRemove; i++) {
+            donutsGroup.remove(donutsGroup.children[0]);
+          }
+        }
+      });
+
+      gui.add(parameters, 'spinText').name('Press to Spin Text');
   },
 
   // onProgress callback
@@ -241,7 +277,12 @@ camera.position.y = 0;
 camera.position.z = 3;
 scene.add(camera);
 
-gui.add(camera.position, 'x').min(-3).max(3).step(0.01).name('Move Camera X Axis');
+gui
+  .add(camera.position, 'x')
+  .min(-3)
+  .max(3)
+  .step(0.01)
+  .name('Move Camera X Axis');
 gui
   .add(camera.position, 'y')
   .min(-3)
