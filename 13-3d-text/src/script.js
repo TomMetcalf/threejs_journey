@@ -289,6 +289,12 @@ gui
   .max(3)
   .step(0.01)
   .name('Move Camera Y Axis');
+gui
+  .add(camera.position, 'z')
+  .min(2)
+  .max(10)
+  .step(0.01)
+  .name('Move Camera Z Axis');
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
