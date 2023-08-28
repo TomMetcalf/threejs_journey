@@ -122,43 +122,48 @@ fontLoader.load(
       numDonuts: 200,
     };
 
-    gui
+    const textMoveFolder = gui.addFolder('Text Move Controls');
+    textMoveFolder
       .add(text.position, 'x')
       .min(-3)
       .max(3)
       .step(0.01)
       .name('Move Text X Axis');
-    gui
+    textMoveFolder
       .add(text.position, 'y')
       .min(-3)
       .max(3)
       .step(0.01)
       .name('Move Text Y Axis');
-    gui
+    textMoveFolder
       .add(text.position, 'z')
       .min(-3)
       .max(3)
       .step(0.01)
       .name('Move Text Z Axis');
-    gui
+    textMoveFolder.close();
+
+    const textRotateFolder = gui.addFolder('Text Rotate Controls');
+    textRotateFolder
       .add(text.rotation, 'x')
       .min(-10)
       .max(10)
       .step(0.01)
       .name('Rotate Text X Axis');
-    gui
+    textRotateFolder
       .add(text.rotation, 'y')
       .min(-10)
       .max(10)
       .step(0.01)
       .name('Rotate Text Y Axis');
-    gui
+    textRotateFolder
       .add(text.rotation, 'z')
       .min(-10)
       .max(10)
       .step(0.01)
       .name('Rotate Text Z Axis');
-    gui.add(text, 'visible').name('Show / Hide');
+    textRotateFolder.close();
+    gui.add(text, 'visible').name('Show / Hide Text');
     gui
       .addColor(parameters, 'color')
       .name('Color')
@@ -216,7 +221,7 @@ fontLoader.load(
         }
       });
 
-      gui.add(parameters, 'spinText').name('Press to Spin Text');
+    gui.add(parameters, 'spinText').name('Press to Spin Text');
   },
 
   // onProgress callback
@@ -277,24 +282,26 @@ camera.position.y = 0;
 camera.position.z = 3;
 scene.add(camera);
 
-gui
+const cameraFolder = gui.addFolder('Camera Controls');
+cameraFolder
   .add(camera.position, 'x')
   .min(-3)
   .max(3)
   .step(0.01)
   .name('Move Camera X Axis');
-gui
+cameraFolder
   .add(camera.position, 'y')
   .min(-3)
   .max(3)
   .step(0.01)
   .name('Move Camera Y Axis');
-gui
+cameraFolder
   .add(camera.position, 'z')
   .min(2)
   .max(10)
   .step(0.01)
   .name('Move Camera Z Axis');
+cameraFolder.close();
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
