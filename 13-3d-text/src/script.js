@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import * as dat from 'lil-gui';
+import GUI from 'lil-gui';
+import gsap from 'gsap';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
@@ -10,7 +11,7 @@ THREE.ColorManagement.enabled = false;
  * Base
  */
 // Debug
-// const gui = new dat.GUI()
+const gui = new GUI();
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -27,7 +28,21 @@ const scene = new THREE.Scene();
  */
 const textureLoader = new THREE.TextureLoader();
 
-const matcapTexture = textureLoader.load('/textures/matcaps/8.png');
+const matcapsTextures = [
+  '/textures/matcaps/1.png',
+  '/textures/matcaps/2.png',
+  '/textures/matcaps/3.png',
+  '/textures/matcaps/4.png',
+  '/textures/matcaps/5.png',
+  '/textures/matcaps/6.png',
+  '/textures/matcaps/7.png',
+  '/textures/matcaps/8.png',
+];
+
+let matcapTexture = textureLoader.load(matcapsTextures[0]);
+
+const donutsGroup = new THREE.Group();
+scene.add(donutsGroup);
 
 /**
  * Fonts
@@ -72,7 +87,9 @@ fontLoader.load(
 
     const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
 
-    for (let i = 0; i < 200; i++) {
+    const numDounts = 200;
+
+    for (let i = 0; i < numDounts; i++) {
       const donut = new THREE.Mesh(donutGeometry, material);
 
       donut.position.x = (Math.random() - 0.5) * 10;
@@ -86,8 +103,84 @@ fontLoader.load(
 
       donut.scale.set(scale, scale, scale);
 
-      scene.add(donut);
+      donutsGroup.add(donut);
     }
+
+    // Debug UI
+    // gui.add(text.position, 'x', -3, 3, 0.01)
+    // gui.add(text.position, 'y', -3, 3, 0.01)
+    // gui.add(text.position, 'z', -3, 3, 0.01)
+
+    const parameters = {
+      color: 0xffffff,
+      spinText: () => {
+        gsap.to(text.rotation, {
+          duration: 1,
+          x: text.rotation.x + Math.PI * 2,
+        });
+      },
+    };
+
+    gui
+      .add(text.position, 'x')
+      .min(-3)
+      .max(3)
+      .step(0.01)
+      .name('Move Text X Axis');
+    gui
+      .add(text.position, 'y')
+      .min(-3)
+      .max(3)
+      .step(0.01)
+      .name('Move Text Y Axis');
+    gui
+      .add(text.position, 'z')
+      .min(-3)
+      .max(3)
+      .step(0.01)
+      .name('Move Text Z Axis');
+    gui
+      .add(text.rotation, 'x')
+      .min(-10)
+      .max(10)
+      .step(0.01)
+      .name('Rotate Text X Axis');
+    gui
+      .add(text.rotation, 'y')
+      .min(-10)
+      .max(10)
+      .step(0.01)
+      .name('Rotate Text Y Axis');
+    gui
+      .add(text.rotation, 'z')
+      .min(-10)
+      .max(10)
+      .step(0.01)
+      .name('Rotate Text Z Axis');
+    gui.add(text, 'visible').name('Show / Hide');
+    gui
+      .addColor(parameters, 'color')
+      .name('Color')
+      .onChange(() => {
+        material.color.set(parameters.color);
+      });
+
+    const matcapTextureRange = {
+      MatcapIndex: 0,
+    };
+
+    gui
+      .add(matcapTextureRange, 'MatcapIndex', 0, matcapsTextures.length - 1, 1)
+      .step(1)
+      .name('Change Style')
+      .onChange(() => {
+        matcapTexture = textureLoader.load(
+          matcapsTextures[matcapTextureRange.MatcapIndex]
+        );
+        material.matcap = matcapTexture;
+        material.needsUpdate = true;
+      });
+    gui.add(parameters, 'spinText').name('Press to Spin Text');
   },
 
   // onProgress callback
@@ -143,10 +236,18 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.x = 1;
-camera.position.y = 1;
-camera.position.z = 2;
+camera.position.x = 0;
+camera.position.y = 0;
+camera.position.z = 3;
 scene.add(camera);
+
+gui.add(camera.position, 'x').min(-3).max(3).step(0.01).name('Move Camera X Axis');
+gui
+  .add(camera.position, 'y')
+  .min(-3)
+  .max(3)
+  .step(0.01)
+  .name('Move Camera Y Axis');
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -167,11 +268,19 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 const clock = new THREE.Clock();
 
+const spinSpeed = 0.05;
+
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
   // Update controls
   controls.update();
+
+  // Calculate the new rotation value based on elapsed time and spin speed
+  const newRotationY = elapsedTime * spinSpeed;
+
+  // Set the rotation value of the donutsGroup to the new rotation value
+  donutsGroup.rotation.y = newRotationY;
 
   // Render
   renderer.render(scene, camera);
