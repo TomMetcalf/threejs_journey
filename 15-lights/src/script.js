@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'lil-gui';
+import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 
 THREE.ColorManagement.enabled = false;
 
@@ -45,9 +46,9 @@ ambientLightFolder
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Ambient Light Intensity');
+  .name('AL Intensity');
 
-ambientLightFolder.addColor(ambientLight, 'color').name('Ambient Light Color');
+ambientLightFolder.addColor(ambientLight, 'color').name('AL Color');
 ambientLightFolder.close();
 
 // Directional Light
@@ -55,17 +56,44 @@ const directionalLight = new THREE.DirectionalLight(0x00ffffc, 0.3);
 directionalLight.position.set(1, 0.25, 0);
 scene.add(directionalLight);
 
+const directionalLightPosition = {
+  x: directionalLight.position.x,
+  y: directionalLight.position.y,
+  z: directionalLight.position.z,
+};
+
+function updateDirectionalLightPosition() {
+  directionalLight.position.set(
+    directionalLightPosition.x,
+    directionalLightPosition.y,
+    directionalLightPosition.z
+  );
+}
+
 const directionalLightFolder = gui.addFolder('Directional Light Controls');
 directionalLightFolder
   .add(directionalLight, 'intensity')
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Directional Light Intensity');
+  .name('DL Intensity');
 
 directionalLightFolder
   .addColor(directionalLight, 'color')
-  .name('Directional Light Color');
+  .name('DL Color');
+
+directionalLightFolder
+  .add(directionalLightPosition, 'x', -10, 10)
+  .onChange(updateDirectionalLightPosition)
+  .name('DL Pos X-Axis');
+directionalLightFolder
+  .add(directionalLightPosition, 'y', -10, 10)
+  .onChange(updateDirectionalLightPosition)
+  .name('DL Pos Y-Axis');
+directionalLightFolder
+  .add(directionalLightPosition, 'z', -10, 10)
+  .onChange(updateDirectionalLightPosition)
+  .name('DL Pos Z-Axis');
 
 directionalLightFolder.close();
 
@@ -79,13 +107,15 @@ hemisphereLightFolder
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Hemisphere Light Intensity');
+  .name('HL Intensity');
 
 // skyColor
-hemisphereLightFolder.addColor(hemisphereLight, 'color');
+hemisphereLightFolder
+  .addColor(hemisphereLight, 'color')
+  .name('HL Sky Color');
 
 // groundColor
-hemisphereLightFolder.addColor(hemisphereLight, 'groundColor');
+hemisphereLightFolder.addColor(hemisphereLight, 'groundColor').name('HL Ground Color');
 
 hemisphereLightFolder.close();
 
@@ -94,27 +124,54 @@ const pointLight = new THREE.PointLight(0xff9000, 0.5, 10, 2);
 pointLight.position.set(1, -0.5, 1);
 scene.add(pointLight);
 
+const pointLightPosition = {
+  x: directionalLight.position.x,
+  y: directionalLight.position.y,
+  z: directionalLight.position.z,
+};
+
+function updatePointLightPosition() {
+  pointLight.position.set(
+    pointLightPosition.x,
+    pointLightPosition.y,
+    pointLightPosition.z
+  );
+}
+
 const pointLightFolder = gui.addFolder('Point Light Controls');
 pointLightFolder
   .add(pointLight, 'intensity')
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Point Light Intensity');
+  .name('PL Intensity');
 
 pointLightFolder
   .add(pointLight, 'distance')
   .min(0)
   .max(50)
   .step(0.01)
-  .name('Point Light Distance');
+  .name('PL Distance');
 
 pointLightFolder
   .add(pointLight, 'decay')
   .min(0)
   .max(5)
   .step(0.01)
-  .name('Point Light Decay');
+  .name('PL Decay');
+
+pointLightFolder
+  .add(pointLightPosition, 'x', -10, 10)
+  .onChange(updatePointLightPosition)
+  .name('PL Pos X-Axis');
+pointLightFolder
+  .add(pointLightPosition, 'y', -10, 10)
+  .onChange(updatePointLightPosition)
+  .name('PL Pos Y-Axis');
+pointLightFolder
+  .add(pointLightPosition, 'z', -10, 10)
+  .onChange(updatePointLightPosition)
+  .name('PL Pos Z-Axis');
 
 pointLightFolder.close();
 
@@ -131,21 +188,21 @@ rectAreaLightFolder
   .min(0)
   .max(5)
   .step(0.01)
-  .name('Rect Area Light Intensity');
+  .name('RAL Intensity');
 
 rectAreaLightFolder
   .add(rectAreaLight, 'width')
   .min(0)
   .max(20)
   .step(0.01)
-  .name('Rect Area Light Width');
+  .name('RAL Width');
 
 rectAreaLightFolder
   .add(rectAreaLight, 'height')
   .min(0)
   .max(20)
   .step(0.01)
-  .name('Rect Area Light Height');
+  .name('RAL Height');
 
 rectAreaLightFolder.addColor(rectAreaLight, 'color');
 
@@ -175,42 +232,39 @@ spotLightFolder
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Spot Light Intensity');
+  .name('SL Intensity');
 
 spotLightFolder
   .add(spotLight, 'distance')
   .min(0)
   .max(50)
   .step(0.01)
-  .name('Spot Light Distance');
+  .name('SL Distance');
 
 spotLightFolder
   .add(spotLight, 'angle')
   .min(Math.PI * 0.0)
   .max(Math.PI * 0.5)
   .step(Math.PI * 0.05)
-  .name('Spot Light Angle');
+  .name('SL Angle');
 
 spotLightFolder
   .add(spotLight, 'penumbra')
   .min(0)
   .max(1)
   .step(0.01)
-  .name('Spot Light Penumbra');
+  .name('SL Penumbra');
 
 spotLightFolder
   .add(spotLight, 'decay')
   .min(0)
   .max(1)
   .step(0.1)
-  .name('Spot Light Decay');
+  .name('SL Decay');
 
-const spotLightTargetControllerX = spotLightFolder.add(
-  { targetX: spotLight.target.position.x },
-  'targetX',
-  -5,
-  5
-).name('X-Axis Spotlight Position')
+const spotLightTargetControllerX = spotLightFolder
+  .add({ targetX: spotLight.target.position.x }, 'targetX', -5, 5)
+  .name('SL Pos X-Axis');
 
 spotLightTargetControllerX.onChange(function (value) {
   spotLight.target.position.x = value;
@@ -218,7 +272,7 @@ spotLightTargetControllerX.onChange(function (value) {
 
 const spotLightTargetControllerY = spotLightFolder
   .add({ targetY: spotLight.target.position.y }, 'targetY', -10, 5)
-  .name('Y-Axis Spotlight Position');
+  .name('SL Pos Y-Axis');
 
 spotLightTargetControllerY.onChange(function (value) {
   spotLight.target.position.y = value;
@@ -226,13 +280,54 @@ spotLightTargetControllerY.onChange(function (value) {
 
 const spotLightTargetControllerZ = spotLightFolder
   .add({ targetZ: spotLight.target.position.z }, 'targetZ', -10, 5)
-  .name('Z-Axis Spotlight Position');
+  .name('SL Pos Z-Axis');
 
 spotLightTargetControllerZ.onChange(function (value) {
   spotLight.target.position.z = value;
 });
 
 spotLightFolder.close();
+
+// Helpers
+const hemisphereLightHelper = new THREE.HemisphereLightHelper(
+  hemisphereLight,
+  0.2
+);
+hemisphereLightHelper.visible = false; 
+scene.add(hemisphereLightHelper);
+
+const directionalLightHelper = new THREE.DirectionalLightHelper(
+  directionalLight,
+  0.2
+);
+directionalLightHelper.visible = false;
+scene.add(directionalLightHelper);
+
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2);
+pointLightHelper.visible = false;
+scene.add(pointLightHelper);
+
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+spotLightHelper.visible = false;
+scene.add(spotLightHelper);
+
+const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight);
+rectAreaLightHelper.visible = false;
+scene.add(rectAreaLightHelper);
+
+
+const helpersFolder = gui.addFolder('Light Helpers');
+helpersFolder
+  .add(hemisphereLightHelper, 'visible')
+  .name('Hemisphere Light Helper');
+helpersFolder
+  .add(directionalLightHelper, 'visible')
+  .name('Directional Light Helper');
+helpersFolder.add(pointLightHelper, 'visible').name('Point Light Helper');
+helpersFolder.add(spotLightHelper, 'visible').name('Spot Light Helper');
+helpersFolder.add(rectAreaLightHelper, 'visible').name('Rect Area Light Helper')
+
+helpersFolder.close()
 
 /**
  * Objects
