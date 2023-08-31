@@ -125,9 +125,9 @@ pointLight.position.set(1, -0.5, 1);
 scene.add(pointLight);
 
 const pointLightPosition = {
-  x: directionalLight.position.x,
-  y: directionalLight.position.y,
-  z: directionalLight.position.z,
+  x: pointLight.position.x,
+  y: pointLight.position.y,
+  z: pointLight.position.z,
 };
 
 function updatePointLightPosition() {
@@ -181,6 +181,20 @@ rectAreaLight.position.set(-1.5, 0, 1.5);
 rectAreaLight.lookAt(new THREE.Vector3());
 scene.add(rectAreaLight);
 
+const rectAreaLightPosition = {
+  x: rectAreaLight.position.x,
+  y: rectAreaLight.position.y,
+  z: rectAreaLight.position.z,
+};
+
+function updateRectAreaLightPosition() {
+  rectAreaLight.position.set(
+    rectAreaLightPosition.x,
+    rectAreaLightPosition.y,
+    rectAreaLightPosition.z
+  );
+}
+
 const rectAreaLightFolder = gui.addFolder('Rect Area Folder');
 
 rectAreaLightFolder
@@ -204,7 +218,20 @@ rectAreaLightFolder
   .step(0.01)
   .name('RAL Height');
 
-rectAreaLightFolder.addColor(rectAreaLight, 'color');
+rectAreaLightFolder.addColor(rectAreaLight, 'color').name('RAL Color');
+
+rectAreaLightFolder
+  .add(rectAreaLightPosition, 'x', -10, 10)
+  .onChange(updateRectAreaLightPosition)
+  .name('RAL Pos X-Axis');
+rectAreaLightFolder
+  .add(rectAreaLightPosition, 'y', -10, 10)
+  .onChange(updateRectAreaLightPosition)
+  .name('RAL Pos Y-Axis');
+rectAreaLightFolder
+  .add(rectAreaLightPosition, 'z', -10, 10)
+  .onChange(updateRectAreaLightPosition)
+  .name('RAL Pos Z-Axis');
 
 rectAreaLightFolder.close()
 
