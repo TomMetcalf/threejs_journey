@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'lil-gui';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
+import gsap from 'gsap';
 
 THREE.ColorManagement.enabled = false;
 
@@ -31,7 +32,7 @@ const scene = new THREE.Scene();
 
 // Ambient Light
 // Shorthand
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
 
 // Longhand
 // const ambientLight = new THREE.AmbientLight();
@@ -431,6 +432,16 @@ camera.position.y = 1;
 camera.position.z = 2;
 scene.add(camera);
 
+window.addEventListener('keydown', () => {
+    gsap.to(camera.position, {
+      x: -  Math.PI * 0.5,
+      y: Math.PI * 0.5,
+      z: Math.PI * 0.5,
+      duration: 35
+       ,
+    });
+})
+
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -465,7 +476,7 @@ const tick = () => {
   // Update controls
   controls.update();
 
-  spotLightHelper.update()
+  spotLightHelper.update();
 
   // Render
   renderer.render(scene, camera);
