@@ -49,6 +49,9 @@ ambientLightFolder
   .name('AL Intensity');
 
 ambientLightFolder.addColor(ambientLight, 'color').name('AL Color');
+
+ambientLightFolder.add(ambientLight, 'visible').name('AL Visible');
+
 ambientLightFolder.close();
 
 // Directional Light
@@ -95,6 +98,8 @@ directionalLightFolder
   .onChange(updateDirectionalLightPosition)
   .name('DL Pos Z-Axis');
 
+directionalLightFolder.add(directionalLight, 'visible').name('DL Visible');
+
 directionalLightFolder.close();
 
 // Hemisphere Light
@@ -116,6 +121,8 @@ hemisphereLightFolder
 
 // groundColor
 hemisphereLightFolder.addColor(hemisphereLight, 'groundColor').name('HL Ground Color');
+
+hemisphereLightFolder.add(hemisphereLight, 'visible').name('HL Visible');
 
 hemisphereLightFolder.close();
 
@@ -173,6 +180,8 @@ pointLightFolder
   .onChange(updatePointLightPosition)
   .name('PL Pos Z-Axis');
 
+pointLightFolder.add(pointLight, 'visible').name('PL Visible');
+
 pointLightFolder.close();
 
 // Rect Area Light
@@ -195,7 +204,7 @@ function updateRectAreaLightPosition() {
   );
 }
 
-const rectAreaLightFolder = gui.addFolder('Rect Area Folder');
+const rectAreaLightFolder = gui.addFolder('Rect Area Light Controls');
 
 rectAreaLightFolder
   .add(rectAreaLight, 'intensity')
@@ -232,6 +241,8 @@ rectAreaLightFolder
   .add(rectAreaLightPosition, 'z', -10, 10)
   .onChange(updateRectAreaLightPosition)
   .name('RAL Pos Z-Axis');
+
+rectAreaLightFolder.add(rectAreaLight, 'visible').name('RAL Visible');
 
 rectAreaLightFolder.close()
 
@@ -313,22 +324,24 @@ spotLightTargetControllerZ.onChange(function (value) {
   spotLight.target.position.z = value;
 });
 
+spotLightFolder.add(spotLight, 'visible').name('SL Visible');
+
 spotLightFolder.close();
 
 // Helpers
-const hemisphereLightHelper = new THREE.HemisphereLightHelper(
-  hemisphereLight,
-  0.2
-);
-hemisphereLightHelper.visible = false; 
-scene.add(hemisphereLightHelper);
-
 const directionalLightHelper = new THREE.DirectionalLightHelper(
   directionalLight,
   0.2
 );
 directionalLightHelper.visible = false;
 scene.add(directionalLightHelper);
+
+const hemisphereLightHelper = new THREE.HemisphereLightHelper(
+  hemisphereLight,
+  0.2
+);
+hemisphereLightHelper.visible = false; 
+scene.add(hemisphereLightHelper);
 
 const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2);
 pointLightHelper.visible = false;
@@ -345,14 +358,14 @@ scene.add(rectAreaLightHelper);
 
 const helpersFolder = gui.addFolder('Light Helpers');
 helpersFolder
-  .add(hemisphereLightHelper, 'visible')
-  .name('Hemisphere Light Helper');
-helpersFolder
   .add(directionalLightHelper, 'visible')
   .name('Directional Light Helper');
+helpersFolder
+  .add(hemisphereLightHelper, 'visible')
+  .name('Hemisphere Light Helper')
 helpersFolder.add(pointLightHelper, 'visible').name('Point Light Helper');
-helpersFolder.add(spotLightHelper, 'visible').name('Spot Light Helper');
 helpersFolder.add(rectAreaLightHelper, 'visible').name('Rect Area Light Helper')
+helpersFolder.add(spotLightHelper, 'visible').name('Spot Light Helper');
 
 helpersFolder.close()
 
@@ -451,6 +464,8 @@ const tick = () => {
 
   // Update controls
   controls.update();
+
+  spotLightHelper.update()
 
   // Render
   renderer.render(scene, camera);
