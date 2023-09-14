@@ -21,7 +21,7 @@ const scene = new THREE.Scene();
  */
 const textureLoader = new THREE.TextureLoader();
 
-const particleTexture = textureLoader.load('/textures/particles/2.png')
+const particleTexture = textureLoader.load('/textures/particles/2.png');
 
 /**
  * Test cube
@@ -44,7 +44,7 @@ const colors = new Float32Array(count * 3);
 
 for (let i = 0; i < count * 3; i++) {
   positions[i] = (Math.random() - 0.5) * 10;
-  colors[i] = Math.random()
+  colors[i] = Math.random();
 }
 
 particlesGeometry.setAttribute(
@@ -52,10 +52,7 @@ particlesGeometry.setAttribute(
   new THREE.BufferAttribute(positions, 3)
 );
 
-particlesGeometry.setAttribute(
-  'color',
-  new THREE.BufferAttribute(colors, 3)
-);
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 // Material
 const particlesMaterial = new THREE.PointsMaterial({
@@ -63,13 +60,13 @@ const particlesMaterial = new THREE.PointsMaterial({
   sizeAttenuation: true,
 });
 // particlesMaterial.color = new THREE.Color('#ff88cc')
-particlesMaterial.transparent = true
-particlesMaterial.alphaMap = particleTexture
+particlesMaterial.transparent = true;
+particlesMaterial.alphaMap = particleTexture;
 // particlesMaterial.alphaTest = 0.001
 // particlesMaterial.depthTest = false
-particlesMaterial.depthWrite = false
-particlesMaterial.blending = THREE.AdditiveBlending
-particlesMaterial.vertexColors = true
+particlesMaterial.depthWrite = false;
+particlesMaterial.blending = THREE.AdditiveBlending;
+particlesMaterial.vertexColors = true;
 
 // Points
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -138,6 +135,13 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
+  // Update particles
+  // Falling particles
+  // particles.position.y = -elapsedTime * 0.02;
+
+  // Rotating particles
+  particles.rotation.y = elapsedTime * 0.02;
+  
   // Update controls
   controls.update();
 
