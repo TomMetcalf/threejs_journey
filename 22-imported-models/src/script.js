@@ -6,11 +6,25 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 THREE.ColorManagement.enabled = false;
 
+// Create a settings object
+const settings = {
+  animationSpeed: 1.0,
+  selectedAnimation: 0,
+};
+
 /**
  * Base
  */
 // Debug
 const gui = new dat.GUI();
+
+// Add the settings to the GUI
+const animationFolder = gui.addFolder('Animation');
+animationFolder.add(settings, 'animationSpeed', 0.1, 3.0).onChange((value) => {
+  if (mixer !== null) {
+    mixer.timeScale = value;
+  }
+});
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -25,17 +39,30 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader)
-let mixer = null
 
-gltfLoader.load('/models/Fox/glTF/Fox.gltf', 
-(gltf) => {
-    mixer = new THREE.AnimationMixer(gltf.scene)
-    const action = mixer.clipAction(gltf.animations[2])
-    action.play()
-    gltf.scene.scale.set(0.025, 0.025, 0.025);
+let mixer = null
+let currentAction = null;
+
+gltfLoader.load('/models/Fox/glTF/Fox.gltf', (gltf) => {
+  mixer = new THREE.AnimationMixer(gltf.scene);
+  const action = mixer.clipAction(gltf.animations[0]);
+  action.play();
+  gltf.scene.scale.set(0.025, 0.025, 0.025);
   scene.add(gltf.scene);
-}
-);
+
+  animationFolder
+    .add(settings, 'selectedAnimation', { 'Look Around': 0, Walk: 1, Run: 2 })
+    .onChange((value) => {
+      if (currentAction) {
+        currentAction.stop();
+      }
+      if (mixer !== null && gltf.animations[value]) {
+        const action = mixer.clipAction(gltf.animations[value]);
+        action.play();
+        currentAction = action;
+      }
+    });
+});
 
 /**
  * Floor
