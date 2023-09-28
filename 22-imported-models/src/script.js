@@ -214,12 +214,14 @@ directionalLightFolder.close();
 const spotLightPosition = {
   x: 0,
   y: 2,
-  z: 6,
+  z: -6,
 };
 
 const spotLight = new THREE.SpotLight(0xffa82e, 0.5, 10, 0.5, 0.25, 1);
 spotLight.position.set(spotLightPosition.x, spotLightPosition.y, spotLightPosition.z);
 scene.add(spotLight);
+
+spotLight.castShadow = true
 
 spotLight.target.position.x = 0;
 spotLight.target.position.y = -1;
