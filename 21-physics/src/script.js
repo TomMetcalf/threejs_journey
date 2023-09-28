@@ -320,6 +320,19 @@ const createBox = (width, height, depth, position) => {
   });
 };
 
+function isSphereOutsideBounds(sphere) {
+  const spherePosition = sphere.body.position;
+  const bounds = 5;
+
+  return (
+    spherePosition.x < -bounds ||
+    spherePosition.x > bounds ||
+    spherePosition.z < -bounds ||
+    spherePosition.z > bounds
+  );
+}
+
+
 /**
  * Animate
  */
@@ -332,18 +345,24 @@ const tick = () => {
   oldElapsedTime = elapsedTime;
 
   // Update physics world
-
-  // sphereBody.applyForce(new CANNON.Vec3( -0.5, 0, 0), sphereBody.position)
   world.step(1 / 60, deltaTime, 3);
 
-  // sphere.position.x = sphereBody.position.x
-  // sphere.position.y = sphereBody.position.y
-  // sphere.position.z = sphereBody.position.z
-  // sphere.position.copy(sphereBody.position)
-
-  for (const object of objectsToUpdate) {
+  for (let i = objectsToUpdate.length - 1; i >= 0; i--) {
+    const object = objectsToUpdate[i];
     object.mesh.position.copy(object.body.position);
     object.mesh.quaternion.copy(object.body.quaternion);
+
+    if (isSphereOutsideBounds(object)) {
+      // Remove body
+      object.body.removeEventListener('collide', playHitSound);
+      world.removeBody(object.body);
+
+      // Remove mesh
+      scene.remove(object.mesh);
+
+      // Remove the object from the objectsToUpdate array
+      objectsToUpdate.splice(i, 1);
+    }
   }
 
   // Update controls
@@ -357,3 +376,4 @@ const tick = () => {
 };
 
 tick();
+
