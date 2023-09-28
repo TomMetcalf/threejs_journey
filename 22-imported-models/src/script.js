@@ -214,17 +214,10 @@ directionalLightFolder.close();
 const spotLightPosition = {
   x: 0,
   y: 2,
-  z: 3,
+  z: 6,
 };
 
-const spotLight = new THREE.SpotLight(
-  0x78ff00,
-  0.5,
-  10,
-  Math.PI * 0.1,
-  0.25,
-  1
-);
+const spotLight = new THREE.SpotLight(0xffa82e, 0.5, 10, 0.5, 0.25, 1);
 spotLight.position.set(spotLightPosition.x, spotLightPosition.y, spotLightPosition.z);
 scene.add(spotLight);
 
@@ -241,6 +234,8 @@ spotLightFolder
   .max(1)
   .step(0.01)
   .name('SL Intensity');
+
+spotLightFolder.addColor(spotLight, 'color').name('SL Color');
 
 spotLightFolder
   .add(spotLight, 'distance')
@@ -318,7 +313,7 @@ const spotLightPosZController = spotLightFolder
 spotLightFolder.add(spotLight, 'visible').name('SL Visible');
 
 const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-spotLightHelper.visible = true;
+spotLightHelper.visible = false;
 scene.add(spotLightHelper);
 
 spotLightFolder.add(spotLightHelper, 'visible').name('Spot Light Helper');
