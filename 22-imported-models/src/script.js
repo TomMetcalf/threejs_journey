@@ -32,6 +32,10 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
+// Fog
+const fog = new THREE.Fog('#262837', 1, 9)
+scene.fog = fog
+
 /**
  * Models
  */
@@ -214,17 +218,17 @@ directionalLightFolder.close();
 const spotLightPosition = {
   x: 0,
   y: 2,
-  z: -6,
+  z: -7,
 };
 
-const spotLight = new THREE.SpotLight(0xffa82e, 0.5, 10, 0.5, 0.25, 1);
+const spotLight = new THREE.SpotLight(0xffa82e, 0.75, 25, 0.5, 0.5, 1);
 spotLight.position.set(spotLightPosition.x, spotLightPosition.y, spotLightPosition.z);
 scene.add(spotLight);
 
 spotLight.castShadow = true
 
 spotLight.target.position.x = 0;
-spotLight.target.position.y = -1;
+spotLight.target.position.y = -0.5;
 spotLight.target.position.z = -1;
 
 scene.add(spotLight.target);
@@ -356,7 +360,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(2, 2, 2);
+camera.position.set(3, 2, 2);
 scene.add(camera);
 
 // Controls
@@ -375,6 +379,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor('#262837');
 
 /**
  * Animate
