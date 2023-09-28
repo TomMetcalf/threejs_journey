@@ -47,6 +47,8 @@ gltfLoader.load('/models/Fox/glTF/Fox.gltf', (gltf) => {
   mixer = new THREE.AnimationMixer(gltf.scene);
   const action = mixer.clipAction(gltf.animations[0]);
   action.play();
+  currentAction = action;
+
   gltf.scene.scale.set(0.025, 0.025, 0.025);
   scene.add(gltf.scene);
 
@@ -57,9 +59,9 @@ gltfLoader.load('/models/Fox/glTF/Fox.gltf', (gltf) => {
         currentAction.stop();
       }
       if (mixer !== null && gltf.animations[value]) {
-        const action = mixer.clipAction(gltf.animations[value]);
-        action.play();
-        currentAction = action;
+        const newAction = mixer.clipAction(gltf.animations[value]);
+        newAction.play();
+        currentAction = newAction; 
       }
     });
 });
