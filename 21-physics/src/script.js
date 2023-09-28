@@ -64,8 +64,14 @@ const hitSound = new Audio('/sounds/hit.mp3');
 const playHitSound = (collision) => {
   const impactStrength = collision.contact.getImpactVelocityAlongNormal();
 
+  const maxImpactStrength = 10
+  const maxVolume = 1.0;
+
+  // Adjust the volume based on impact strength
+  const volume = Math.min(impactStrength / maxImpactStrength, maxVolume);
+
   if (impactStrength > 1.5) {
-    hitSound.volume = Math.random()
+    hitSound.volume = volume;
     hitSound.currentTime = 0;
     hitSound.play();
   }
