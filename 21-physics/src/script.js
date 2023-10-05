@@ -60,6 +60,7 @@ const scene = new THREE.Scene();
  * Sounds
  */
 const hitSound = new Audio('/sounds/hit.mp3');
+const bubbleSound = new Audio('/sounds/bubble.mp3')
 
 const playHitSound = (collision) => {
   const impactStrength = collision.contact.getImpactVelocityAlongNormal();
@@ -70,12 +71,25 @@ const playHitSound = (collision) => {
   // Adjust the volume based on impact strength
   const volume = Math.min(impactStrength / maxImpactStrength, maxVolume);
 
-  if (impactStrength > 1.5) {
+  if (impactStrength > 0.5) {
     hitSound.volume = volume;
     hitSound.currentTime = 0;
     hitSound.play();
   }
 };
+
+const playBubbleSound = () => {
+  bubbleSound.volume = 0.6;
+  bubbleSound.currentTime = 0;
+  bubbleSound.play();
+}
+
+// Random color
+function getRandomColor() {
+  const color = new THREE.Color();
+  color.setRGB(Math.random(), Math.random(), Math.random());
+  return color;
+}
 
 /**
  * Textures
@@ -254,14 +268,16 @@ const objectsToUpdate = [];
 
 // Sphere
 const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
-const sphereMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
-  envMap: environmentMapTexture,
-});
 
 const createSphere = (radius, position) => {
   // Three.js Mesh
+  const randomColor = getRandomColor();
+  const sphereMaterial = new THREE.MeshStandardMaterial({
+    color: randomColor,
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+  });
   const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
   mesh.scale.set(radius, radius, radius);
   mesh.castShadow = true;
@@ -291,13 +307,16 @@ createSphere(0.5, { x: 0, y: 3, z: 0 });
 
 // Box
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const boxMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
-  envMap: environmentMapTexture,
-});
+
 
 const createBox = (width, height, depth, position) => {
+  const randomColor = getRandomColor();
+  const boxMaterial = new THREE.MeshStandardMaterial({
+    color: randomColor,
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+  });
   // Three.js Mesh
   const mesh = new THREE.Mesh(boxGeometry, boxMaterial);
   mesh.scale.set(width, height, depth);
@@ -359,6 +378,7 @@ const tick = () => {
     object.mesh.quaternion.copy(object.body.quaternion);
 
     if (isSphereOutsideBounds(object)) {
+      playBubbleSound();
       // Remove body
       object.body.removeEventListener('collide', playHitSound);
       world.removeBody(object.body);
