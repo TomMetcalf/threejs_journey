@@ -63,14 +63,22 @@ const hitSound = new Audio('/sounds/hit.mp3');
 const bubbleSound = new Audio('/sounds/bubble.mp3');
 const bounceSound = new Audio('/sounds/bounce.mp3');
 
-const playSound = (collision, material) => {
+const playSound = (collision, material, object) => {
   const impactStrength = collision.contact.getImpactVelocityAlongNormal();
 
   const maxImpactStrength = 10;
   const maxVolume = 1.0;
 
+  // Calculate a volume scale factor based on the size of the object
+  const sizeScaleFactor = Math.min(
+    object.scale.x,
+    object.scale.y,
+    object.scale.z
+  );
+
   // Adjust the volume based on impact strength
-  const volume = Math.min(impactStrength / maxImpactStrength, maxVolume);
+  const volume =
+    Math.min(impactStrength / maxImpactStrength, maxVolume) * sizeScaleFactor;
 
   if (impactStrength > 0.7) {
     if (material === ballMaterial) {
@@ -313,7 +321,7 @@ const createSphere = (radius, position) => {
     material: ballMaterial,
   });
   body.position.copy(position);
-  body.addEventListener('collide', (e) => playSound(e, ballMaterial));
+  body.addEventListener('collide', (e) => playSound(e, ballMaterial, mesh));
   world.addBody(body);
 
   // Save objects to update
@@ -354,7 +362,7 @@ const createBox = (width, height, depth, position) => {
     material: cubeMaterial,
   });
   body.position.copy(position);
-  body.addEventListener('collide', (e) => playSound(e, cubeMaterial));
+  body.addEventListener('collide', (e) => playSound(e, cubeMaterial, mesh));
   world.addBody(body);
 
   // Save objects to update
