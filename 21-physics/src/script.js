@@ -30,22 +30,22 @@ debugObject.createBox = () => {
   });
 };
 
-gui.add(debugObject, 'createBox').name('Create a Box')
+gui.add(debugObject, 'createBox').name('Create a Box');
 
 debugObject.reset = () => {
-    // Remove
-    for (const object of objectsToUpdate) {
-        // Remove body
-        object.body.removeEventListener('collide', playHitSound)
-        world.removeBody(object.body)
+  // Remove
+  for (const object of objectsToUpdate) {
+    // Remove body
+    object.body.removeEventListener('collide', playSound);
+    world.removeBody(object.body);
 
-        // Remove mesh
-        scene.remove(object.mesh)
-    }
-    objectsToUpdate.splice(0, objectsToUpdate.length);
-}
+    // Remove mesh
+    scene.remove(object.mesh);
+  }
+  objectsToUpdate.splice(0, objectsToUpdate.length);
+};
 
-gui.add(debugObject, 'reset').name('Remove Objects')
+gui.add(debugObject, 'reset').name('Remove Objects');
 
 /**
  * Base
@@ -60,21 +60,29 @@ const scene = new THREE.Scene();
  * Sounds
  */
 const hitSound = new Audio('/sounds/hit.mp3');
-const bubbleSound = new Audio('/sounds/bubble.mp3')
+const bubbleSound = new Audio('/sounds/bubble.mp3');
+const bounceSound = new Audio('/sounds/bounce.mp3');
 
-const playHitSound = (collision) => {
+const playSound = (collision, material) => {
   const impactStrength = collision.contact.getImpactVelocityAlongNormal();
 
-  const maxImpactStrength = 10
+  const maxImpactStrength = 10;
   const maxVolume = 1.0;
 
   // Adjust the volume based on impact strength
   const volume = Math.min(impactStrength / maxImpactStrength, maxVolume);
 
-  if (impactStrength > 0.5) {
-    hitSound.volume = volume;
-    hitSound.currentTime = 0;
-    hitSound.play();
+  if (impactStrength > 0.7) {
+    if (material === ballMaterial) {
+      const adjustedVolume = volume * 0.5;
+      bounceSound.volume = adjustedVolume;
+      bounceSound.currentTime = 0;
+      bounceSound.play();
+    } else if (material === cubeMaterial) {
+      hitSound.volume = volume;
+      hitSound.currentTime = 0;
+      hitSound.play();
+    }
   }
 };
 
@@ -82,7 +90,7 @@ const playBubbleSound = () => {
   bubbleSound.volume = 0.6;
   bubbleSound.currentTime = 0;
   bubbleSound.play();
-}
+};
 
 // Random color
 function getRandomColor() {
@@ -116,31 +124,42 @@ world.allowSleep = true;
 world.gravity.set(0, -9.82, 0);
 
 // Materials
-// const concreteMaterial = new CANNON.Material('concrete')
-// const plasticMaterial = new CANNON.Material('plastic')
+const floorMaterial = new CANNON.Material('floor');
+const ballMaterial = new CANNON.Material('ball');
+const cubeMaterial = new CANNON.Material('cube');
 
-// const concretePlasticContactMaterial = new CANNON.ContactMaterial(
-//     concreteMaterial,
-//     plasticMaterial,
-//     {
-//         friction: 0.1,
-//         restitution: 0.7,
-//     }
-// )
-// world.addContactMaterial(concretePlasticContactMaterial)
-
-const defaultMaterial = new CANNON.Material('default');
-
-const defaultContactMaterial = new CANNON.ContactMaterial(
-  defaultMaterial,
-  defaultMaterial,
+const floorBallContactMaterial = new CANNON.ContactMaterial(
+  floorMaterial,
+  ballMaterial,
   {
     friction: 0.1,
     restitution: 0.7,
   }
 );
-world.addContactMaterial(defaultContactMaterial);
-world.defaultContactMaterial = defaultContactMaterial;
+world.addContactMaterial(floorBallContactMaterial);
+
+const floorCubeContactMaterial = new CANNON.ContactMaterial(
+  floorMaterial,
+  cubeMaterial,
+  {
+    friction: 0.1,
+    restitution: 0.3,
+  }
+);
+world.addContactMaterial(floorCubeContactMaterial);
+
+// const defaultMaterial = new CANNON.Material('default');
+
+// const defaultContactMaterial = new CANNON.ContactMaterial(
+//   defaultMaterial,
+//   defaultMaterial,
+//   {
+//     friction: 0.1,
+//     restitution: 0.7,
+//   }
+// );
+// world.addContactMaterial(defaultContactMaterial);
+// world.defaultContactMaterial = defaultContactMaterial;
 
 // Sphere
 // const sphereShape = new CANNON.Sphere(0.5)
@@ -155,6 +174,7 @@ world.defaultContactMaterial = defaultContactMaterial;
 // Floor
 const floorShape = new CANNON.Plane();
 const floorBody = new CANNON.Body();
+floorBody.material = floorMaterial;
 floorBody.mass = 0;
 floorBody.addShape(floorShape);
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
@@ -290,10 +310,10 @@ const createSphere = (radius, position) => {
     mass: 1,
     position: new CANNON.Vec3(0, 3, 0),
     shape,
-    material: defaultMaterial,
+    material: ballMaterial,
   });
   body.position.copy(position);
-  body.addEventListener('collide', playHitSound);
+  body.addEventListener('collide', (e) => playSound(e, ballMaterial));
   world.addBody(body);
 
   // Save objects to update
@@ -303,11 +323,10 @@ const createSphere = (radius, position) => {
   });
 };
 
-createSphere(0.5, { x: 0, y: 3, z: 0 });
+// createSphere(0.5, { x: 0, y: 3, z: 0 });
 
 // Box
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-
 
 const createBox = (width, height, depth, position) => {
   const randomColor = getRandomColor();
@@ -332,10 +351,10 @@ const createBox = (width, height, depth, position) => {
     mass: 1,
     position: new CANNON.Vec3(0, 3, 0),
     shape,
-    material: defaultMaterial,
+    material: cubeMaterial,
   });
   body.position.copy(position);
-  body.addEventListener('collide', playHitSound);
+  body.addEventListener('collide', (e) => playSound(e, cubeMaterial));
   world.addBody(body);
 
   // Save objects to update
@@ -356,7 +375,6 @@ function isSphereOutsideBounds(sphere) {
     spherePosition.z > bounds
   );
 }
-
 
 /**
  * Animate
@@ -380,7 +398,7 @@ const tick = () => {
     if (isSphereOutsideBounds(object)) {
       playBubbleSound();
       // Remove body
-      object.body.removeEventListener('collide', playHitSound);
+      object.body.removeEventListener('collide', playSound);
       world.removeBody(object.body);
 
       // Remove mesh
@@ -402,4 +420,3 @@ const tick = () => {
 };
 
 tick();
-
