@@ -14,6 +14,7 @@ const cubeTextureLoader = new THREE.CubeTextureLoader();
  */
 // Debug
 const gui = new dat.GUI();
+const global = {}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -22,8 +23,24 @@ const canvas = document.querySelector('canvas.webgl');
 const scene = new THREE.Scene();
 
 /**
+ * Update all materials
+ */
+const updateAllMaterials = () => {
+  scene.traverse((child) => {
+    if (child.isMesh && child.material.isMeshStandardMaterial) {
+      child.material.envMapIntensity = global.envMapIntensity
+    }
+  });
+};
+
+/**
  * Environment map
  */
+// Global intensity
+global.envMapIntensity = 1
+gui.add(global, 'envMapIntensity').min(0).max(10).step(0.001).onChange(updateAllMaterials)
+
+
 // LDR cube texture
 const environemntMap = cubeTextureLoader.load([
   '/environmentMaps/0/px.png',
@@ -34,15 +51,23 @@ const environemntMap = cubeTextureLoader.load([
   '/environmentMaps/0/nz.png',
 ]);
 
-scene.background = environemntMap
+scene.environment = environemntMap;
+scene.background = environemntMap;
 
 /**
  * Torus Knot
  */
 const torusKnot = new THREE.Mesh(
   new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-  new THREE.MeshBasicMaterial()
+  new THREE.MeshStandardMaterial({
+    roughness: 0.3,
+    metalness: 1,
+    color: 0xaaaaaa,
+  })
 );
+
+// torusKnot.material.envMap = environemntMap
+torusKnot.position.x = -4;
 torusKnot.position.y = 4;
 scene.add(torusKnot);
 
@@ -52,6 +77,8 @@ scene.add(torusKnot);
 gltfLoader.load('models/FlightHelmet/glTF/FlightHelmet.gltf', (gltf) => {
   gltf.scene.scale.set(10, 10, 10);
   scene.add(gltf.scene);
+
+  updateAllMaterials();
 });
 
 /**
