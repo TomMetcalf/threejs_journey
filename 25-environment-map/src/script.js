@@ -14,7 +14,7 @@ const cubeTextureLoader = new THREE.CubeTextureLoader();
  */
 // Debug
 const gui = new dat.GUI();
-const global = {}
+const global = {};
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -28,7 +28,7 @@ const scene = new THREE.Scene();
 const updateAllMaterials = () => {
   scene.traverse((child) => {
     if (child.isMesh && child.material.isMeshStandardMaterial) {
-      child.material.envMapIntensity = global.envMapIntensity
+      child.material.envMapIntensity = global.envMapIntensity;
     }
   });
 };
@@ -36,10 +36,19 @@ const updateAllMaterials = () => {
 /**
  * Environment map
  */
-// Global intensity
-global.envMapIntensity = 1
-gui.add(global, 'envMapIntensity').min(0).max(10).step(0.001).onChange(updateAllMaterials)
+scene.backgroundBlurriness = 0;
+scene.backgroundIntensity = 1;
+gui.add(scene, 'backgroundBlurriness').min(0).max(1).step(0.001);
+gui.add(scene, 'backgroundIntensity').min(0).max(10).step(0.001);
 
+// Global intensity
+global.envMapIntensity = 1;
+gui
+  .add(global, 'envMapIntensity')
+  .min(0)
+  .max(10)
+  .step(0.001)
+  .onChange(updateAllMaterials);
 
 // LDR cube texture
 const environemntMap = cubeTextureLoader.load([
