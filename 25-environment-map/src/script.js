@@ -48,7 +48,7 @@ gui.add(scene, 'backgroundBlurriness').min(0).max(1).step(0.001);
 gui.add(scene, 'backgroundIntensity').min(0).max(10).step(0.001);
 
 // Global intensity
-global.envMapIntensity = 1;
+global.envMapIntensity = 0.3;
 gui
   .add(global, 'envMapIntensity')
   .min(0)
@@ -115,25 +115,25 @@ rgbeLoader.load('/environmentMaps/2/2k.hdr',
 /**
  * Torus Knot
  */
-const torusKnot = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-  new THREE.MeshStandardMaterial({
-    roughness: 0.3,
-    metalness: 1,
-    color: 0xaaaaaa,
-  })
-);
+// const torusKnot = new THREE.Mesh(
+//   new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
+//   new THREE.MeshStandardMaterial({
+//     roughness: 0.3,
+//     metalness: 1,
+//     color: 0xaaaaaa,
+//   })
+// );
 
 // torusKnot.material.envMap = environemntMap
-torusKnot.position.x = -4;
-torusKnot.position.y = 4;
-scene.add(torusKnot);
+// torusKnot.position.x = -4;
+// torusKnot.position.y = 4;
+// scene.add(torusKnot);
 
 /**
  * Models
  */
-gltfLoader.load('models/FlightHelmet/glTF/FlightHelmet.gltf', (gltf) => {
-  gltf.scene.scale.set(10, 10, 10);
+gltfLoader.load('models/Fox/glTF/Fox.gltf', (gltf) => {
+  gltf.scene.scale.set(0.025, 0.025, 0.025);
   scene.add(gltf.scene);
 
   updateAllMaterials();
@@ -171,7 +171,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(4, 5, 4);
+camera.position.set(5, 3, 6);
 scene.add(camera);
 
 // Controls
