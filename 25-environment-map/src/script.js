@@ -48,7 +48,7 @@ gui.add(scene, 'backgroundBlurriness').min(0).max(1).step(0.001);
 gui.add(scene, 'backgroundIntensity').min(0).max(10).step(0.001);
 
 // Global intensity
-global.envMapIntensity = 0.3;
+global.envMapIntensity = 0.2;
 gui
   .add(global, 'envMapIntensity')
   .min(0)
@@ -96,38 +96,57 @@ gui
 // scene.environment = environmentMap;
 
 // Ground projected skybox
-rgbeLoader.load('/environmentMaps/2/2k.hdr',
-  (environmentMap) => {
-    environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-    scene.environment = environmentMap;
+// rgbeLoader.load('/environmentMaps/2/2k.hdr',
+//   (environmentMap) => {
+//     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//     scene.environment = environmentMap;
 
-    // Skybox
-    const skybox = new GroundProjectedSkybox(environmentMap)
-    skybox.radius = 120
-    skybox.height = 11
-    skybox.scale.setScalar(50)
-    scene.add(skybox)
+//     // Skybox
+//     const skybox = new GroundProjectedSkybox(environmentMap)
+//     skybox.radius = 120
+//     skybox.height = 11
+//     skybox.scale.setScalar(50)
+//     scene.add(skybox)
 
-    gui.add(skybox, 'radius', 1, 200, 0.1)
-    gui.add(skybox, 'height', 1, 200, 0.1)
-  });
+//     gui.add(skybox, 'radius', 1, 200, 0.1)
+//     gui.add(skybox, 'height', 1, 200, 0.1)
+//   });
+
+/**
+ * Real time environment map
+ */
+const environmentMap = textureLoader.load(
+  '/environmentMaps/blockadesLabsSkybox/interior_views_cozy_wood_cabin_with_cauldron_and_p.jpg'
+);
+environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+environmentMap.colorSpace = THREE.SRGBColorSpace;
+
+scene.background = environmentMap;
+
+// Holy donut
+const holyDonut = new THREE.Mesh(
+  new THREE.TorusGeometry(8, 0.5),
+  new THREE.MeshBasicMaterial({ color: 'white' })
+);
+holyDonut.position.y = 3.5;
+scene.add(holyDonut);
 
 /**
  * Torus Knot
  */
-// const torusKnot = new THREE.Mesh(
-//   new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
-//   new THREE.MeshStandardMaterial({
-//     roughness: 0.3,
-//     metalness: 1,
-//     color: 0xaaaaaa,
-//   })
-// );
+const torusKnot = new THREE.Mesh(
+  new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
+  new THREE.MeshStandardMaterial({
+    roughness: 0.3,
+    metalness: 1,
+    color: 0xaaaaaa,
+  })
+);
 
-// torusKnot.material.envMap = environemntMap
-// torusKnot.position.x = -4;
-// torusKnot.position.y = 4;
-// scene.add(torusKnot);
+torusKnot.material.envMap = environmentMap;
+torusKnot.position.x = -4;
+torusKnot.position.y = 4;
+scene.add(torusKnot);
 
 /**
  * Models
